@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ALVAN AI — Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03030A;
+  --border:rgba(255,200,50,0.1);
+  --border-hi:rgba(255,200,50,0.4);
+  --gold:#FFD046;--gold2:#FFA500;
+  --cyan:#00F0FF;--cyan2:#00B4CC;
+  --neon:#39FF14;--red:#FF3366;--purple:#9D4EDD;
+  --pink:#FF6EFF;
+  --text:#EAEAF4;--muted:#55556A;--muted2:#7A7A9A;
+}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow:hidden}
+
+/* BG */
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,200,50,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,200,50,0.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.bg-glow{position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(140px)}
+.g1{width:700px;height:700px;top:-300px;left:-300px;background:var(--gold);opacity:0.07}
+.g2{width:600px;height:600px;bottom:-250px;right:-250px;background:var(--cyan);opacity:0.06}
+.g3{width:350px;height:350px;top:35%;left:30%;background:var(--purple);opacity:0.04}
+
+/* LAYOUT */
+.app{position:relative;z-index:1;display:grid;grid-template-columns:270px 1fr;grid-template-rows:58px 1fr;height:100vh;max-width:1300px;margin:0 auto}
+
+/* HEADER */
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:rgba(3,3,10,0.97);backdrop-filter:blur(12px);z-index:10}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:34px;height:34px;border:1.5px solid var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--gold);box-shadow:0 0 12px rgba(255,208,70,0.2);animation:glow-pulse 3s ease-in-out infinite}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 12px rgba(255,208,70,0.2)}50%{box-shadow:0 0 24px rgba(255,208,70,0.5)}}
+.logo h1{font-family:'Orbitron',monospace;font-size:12px;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+.logo span{font-size:10px;color:var(--muted2);letter-spacing:2px;display:block;margin-top:1px}
+.hbadges{display:flex;gap:8px;align-items:center}
+.badge{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 9px;border-radius:4px;letter-spacing:1.5px;border:1px solid}
+.b-online{color:var(--neon);border-color:rgba(57,255,20,0.25);background:rgba(57,255,20,0.04)}
+.b-free{color:var(--cyan);border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.04)}
+.b-powered{color:var(--muted2);border-color:rgba(120,120,160,0.2);background:transparent}
+
+/* SIDEBAR */
+.sidebar{background:rgba(5,5,14,0.97);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-section{padding:14px 12px 6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:3px;border-bottom:1px solid var(--border)}
+.agents-list{padding:8px 8px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.agents-list::-webkit-scrollbar{width:2px}
+.agents-list::-webkit-scrollbar-thumb{background:rgba(255,208,70,0.1)}
+
+.agent-btn{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:9px;cursor:pointer;border:1px solid transparent;background:transparent;transition:all .18s;width:100%;text-align:left}
+.agent-btn:hover{background:rgba(255,255,255,0.02);border-color:var(--border)}
+.agent-btn.active{background:rgba(255,208,70,0.06);border-color:rgba(255,208,70,0.3)}
+.agent-btn.active .agent-dot{background:var(--neon);box-shadow:0 0 6px var(--neon)}
+.agent-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;border:1px solid rgba(255,255,255,0.05)}
+.agent-txt{flex:1;min-width:0}
+.agent-name{font-size:13px;font-weight:600;color:var(--text);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent-sub{font-size:10px;color:var(--muted2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:all .2s}
+
+.category-label{font-size:9px;color:var(--muted);letter-spacing:2px;font-family:'Share Tech Mono',monospace;padding:10px 11px 4px;text-transform:uppercase}
+
+.sidebar-bottom{padding:10px;border-top:1px solid var(--border)}
+.new-chat-btn{width:100%;padding:9px;background:linear-gradient(135deg,rgba(255,208,70,0.08),rgba(0,240,255,0.04));border:1px solid var(--border-hi);color:var(--gold);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;border-radius:8px;cursor:pointer;transition:all .2s}
+.new-chat-btn:hover{background:linear-gradient(135deg,rgba(255,208,70,0.14),rgba(0,240,255,0.08))}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden;background:rgba(3,3,10,0.5)}
+.agent-topbar{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:rgba(3,3,10,0.8);flex-shrink:0}
+.topbar-ico{font-size:20px}
+.topbar-info h2{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.topbar-info p{font-size:11px;color:var(--muted2);margin-top:1px}
+.topbar-tag{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:1px}
+.tag-general{color:var(--cyan);border:1px solid rgba(0,240,255,0.2);background:rgba(0,240,255,0.04)}
+.tag-roblox{color:var(--gold);border:1px solid rgba(255,208,70,0.2);background:rgba(255,208,70,0.04)}
+
+/* CHAT */
+.chat-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 24px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.chat-area::-webkit-scrollbar{width:3px}
+.chat-area::-webkit-scrollbar-thumb{background:rgba(255,208,70,0.12);border-radius:2px}
+
+/* Welcome */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:14px;animation:fade-in .6s ease}
+@keyframes fade-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.welcome-ico{font-size:50px;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.welcome h2{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.welcome p{color:var(--muted2);font-size:13px;max-width:400px;line-height:1.65}
+.free-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.2);color:var(--neon);font-size:11px;padding:5px 12px;border-radius:20px;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.sugs{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:4px}
+.sug{background:rgba(255,255,255,0.02);border:1px solid var(--border);color:var(--muted2);font-family:'Rajdhani',sans-serif;font-size:12px;padding:7px 13px;border-radius:8px;cursor:pointer;transition:all .18s;letter-spacing:.3px}
+.sug:hover{border-color:var(--border-hi);color:var(--gold);background:rgba(255,208,70,0.04)}
+
+/* Messages */
+.msg{display:flex;gap:10px;animation:msg-in .28s ease}
+@keyframes msg-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'Orbitron',monospace}
+.av-ai{background:linear-gradient(135deg,rgba(255,208,70,0.1),rgba(0,240,255,0.07));border:1px solid rgba(255,208,70,0.3);color:var(--gold)}
+.av-user{background:linear-gradient(135deg,rgba(0,240,255,0.08),rgba(57,255,20,0.05));border:1px solid rgba(0,240,255,0.2);color:var(--cyan)}
+.bubble{max-width:80%;padding:10px 14px;border-radius:11px;font-size:14px;line-height:1.65}
+.bubble.ai{background:rgba(6,8,20,0.95);border:1px solid var(--border);border-left:2px solid var(--gold);box-shadow:0 3px 16px rgba(0,0,0,0.5)}
+.bubble.user{background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.15);border-right:2px solid var(--cyan)}
+
+/* Code */
+.bubble pre{background:rgba(0,0,0,0.7);border:1px solid rgba(255,208,70,0.1);border-radius:8px;padding:11px 13px;margin:9px 0;overflow-x:auto;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.6;color:#B8FFB8}
+.bubble code{font-family:'Share Tech Mono',monospace;background:rgba(255,208,70,0.08);padding:1px 5px;border-radius:3px;font-size:12px;color:var(--gold)}
+.bubble pre code{background:none;padding:0;color:inherit}
+.code-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
+.copy-btn{background:rgba(255,208,70,0.07);border:1px solid rgba(255,208,70,0.15);color:var(--gold);font-size:10px;padding:2px 8px;border-radius:3px;cursor:pointer;font-family:'Share Tech Mono',monospace;transition:all .18s;letter-spacing:1px}
+.copy-btn:hover{background:rgba(255,208,70,0.15)}
+.copy-btn.ok{color:var(--neon);border-color:rgba(57,255,20,0.3)}
+.bubble h3{color:var(--gold);font-family:'Orbitron',monospace;font-size:11px;margin:10px 0 5px;letter-spacing:1px}
+.bubble strong{color:var(--gold);font-weight:600}
+.bubble em{color:var(--cyan);font-style:normal}
+.bubble ul,.bubble ol{padding-left:16px;margin:5px 0}
+.bubble li{margin:3px 0}
+.bubble hr{border:none;border-top:1px solid var(--border);margin:10px 0}
+
+/* Typing */
+.typing-row{display:flex;align-items:center;gap:5px;padding:8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;animation:dp 1.2s ease-in-out infinite}
+.dot:nth-child(1){background:var(--gold)}
+.dot:nth-child(2){background:var(--gold2);animation-delay:.2s}
+.dot:nth-child(3){background:var(--cyan);animation-delay:.4s}
+@keyframes dp{0%,80%,100%{transform:scale(.7);opacity:.3}40%{transform:scale(1.1);opacity:1}}
+
+/* INPUT */
+.input-area{padding:12px 20px 16px;border-top:1px solid var(--border);background:rgba(3,3,10,0.9);flex-shrink:0}
+.iw{display:flex;gap:8px;align-items:flex-end;background:rgba(6,6,18,0.95);border:1px solid var(--border);border-radius:12px;padding:8px 8px 8px 14px;transition:border-color .2s,box-shadow .2s}
+.iw:focus-within{border-color:var(--border-hi);box-shadow:0 0 16px rgba(255,208,70,0.06)}
+#prompt{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;resize:none;max-height:140px;line-height:1.5;padding:3px 0;scrollbar-width:thin}
+#prompt::placeholder{color:var(--muted)}
+.send-btn{width:38px;height:38px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .18s;box-shadow:0 0 12px rgba(255,208,70,0.25)}
+.send-btn:hover:not(:disabled){transform:scale(1.07);box-shadow:0 0 22px rgba(255,208,70,0.5)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.ifooter{display:flex;justify-content:space-between;margin-top:6px;padding:0 2px}
+.ihint{font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;letter-spacing:.3px}
+.token-info{font-size:10px;color:var(--muted2);font-family:'Share Tech Mono',monospace}
+.token-info span{color:var(--neon)}
+
+/* Error */
+.err-bub{background:rgba(255,51,102,0.04);border:1px solid rgba(255,51,102,0.2);border-left:2px solid var(--red);color:rgba(255,120,140,.9);font-size:13px;padding:9px 13px;border-radius:9px;max-width:80%}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow g1"></div>
+<div class="bg-glow g2"></div>
+<div class="bg-glow g3"></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">A</div>
+      <div>
+        <h1>ALVAN AI</h1>
+        <span>INTELLIGENCE PLATFORM</span>
+      </div>
+    </div>
+    <div class="hbadges">
+      <span class="badge b-powered">POWERED BY GEMINI</span>
+      <span class="badge b-free">✦ FREE</span>
+      <span class="badge b-online">● ONLINE</span>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">◆ AGENT LIST</div>
+    <div class="agents-list" id="agentsList"></div>
+    <div class="sidebar-bottom">
+      <button class="new-chat-btn" onclick="clearChat()">+ NEW CHAT</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="agent-topbar">
+      <div class="topbar-ico" id="topIco">✨</div>
+      <div class="topbar-info">
+        <h2 id="topName">GENERAL AI</h2>
+        <p id="topDesc">Tanya apa saja, AI akan menjawab</p>
+      </div>
+      <span class="topbar-tag tag-general" id="topTag">GENERAL</span>
+    </div>
+
+    <div class="chat-area" id="chatArea"></div>
+
+    <div class="input-area">
+      <div class="iw">
+        <textarea id="prompt" rows="1" placeholder="Ketik pesan kamu..."></textarea>
+        <button class="send-btn" id="sendBtn" onclick="send()">➤</button>
+      </div>
+      <div class="ifooter">
+        <span class="ihint">ENTER = kirim &nbsp;|&nbsp; SHIFT+ENTER = baris baru</span>
+        <span class="token-info">Token: <span id="tokenCount">0</span> / session</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── AGENTS ──
+const AGENTS = [
+  // ── GENERAL ──
+  { cat:'GENERAL', id:'general', name:'General AI', icon:'✨', color:'#FFD046', tag:'general',
+    desc:'Tanya apa saja bebas',
+    topDesc:'Tanya apa saja, AI akan menjawab',
+    placeholder:'Tanya apa saja...',
+    sugs:['Apa itu machine learning?','Buatkan essay singkat tentang AI','Rekomendasi film sci-fi terbaik','Jelaskan cara kerja internet'],
+    system:`Kamu adalah ALVAN AI, asisten AI cerdas yang bisa menjawab pertanyaan apa saja.
+Kamu berbicara dalam bahasa yang digunakan pengguna — jika Indonesia maka jawab Indonesia, jika Inggris maka jawab Inggris.
+Kamu ramah, cerdas, informatif, dan selalu memberikan jawaban yang berguna.
+Gunakan format markdown untuk memudahkan pembacaan.`
+  },
+  { cat:'GENERAL', id:'writer', name:'AI Writer', icon:'✍️', color:'#FF6EFF', tag:'general',
+    desc:'Tulis konten, essay, artikel',
+    topDesc:'Bantu menulis konten, artikel, essay, caption',
+    placeholder:'Minta saya untuk menulis sesuatu...',
+    sugs:['Tulis caption Instagram produk fashion','Buat artikel 500 kata tentang AI','Essay tentang pentingnya pendidikan','Tulis bio profil profesional'],
+    system:`Kamu adalah ALVAN Writer AI, ahli dalam penulisan konten berkualitas tinggi.
+Kamu bisa menulis artikel, essay, caption, bio, script, cerita pendek, dan berbagai jenis konten.
+Selalu sesuaikan tone dan gaya dengan kebutuhan pengguna.
+Jawab dalam bahasa yang digunakan pengguna.`
+  },
+  { cat:'GENERAL', id:'translator', name:'Translator', icon:'🌐', color:'#00F0FF', tag:'general',
+    desc:'Terjemahkan ke berbagai bahasa',
+    topDesc:'Terjemahkan teks ke bahasa manapun',
+    placeholder:'Ketik teks yang ingin diterjemahkan...',
+    sugs:['Terjemahkan ke Inggris: Selamat pagi','Translate to Indonesian: Good morning','Terjemahkan ke Jepang: Terima kasih','Translate to French: How are you?'],
+    system:`Kamu adalah ALVAN Translator AI, ahli penerjemahan ke semua bahasa di dunia.
+Terjemahkan dengan akurat dan natural, pertahankan konteks dan nuansa asli.
+Jika tidak ada bahasa tujuan yang disebutkan, tanya dulu ke bahasa apa.
+Berikan juga transliterasi jika bahasa menggunakan aksara berbeda (misal Jepang, Arab, Korea).`
+  },
+  { cat:'GENERAL', id:'coder', name:'Code AI', icon:'💻', color:'#39FF14', tag:'general',
+    desc:'Bantu coding berbagai bahasa',
+    topDesc:'Bantu coding Python, JS, HTML, dan semua bahasa',
+    placeholder:'Tanya tentang coding atau minta buatkan kode...',
+    sugs:['Buat REST API dengan Python Flask','Buatkan website landing page HTML','Script Python untuk scraping web','Jelaskan perbedaan React vs Vue'],
+    system:`Kamu adalah ALVAN Code AI, expert programmer yang menguasai semua bahasa pemrograman.
+Kamu ahli dalam Python, JavaScript, TypeScript, HTML/CSS, React, Node.js, dan banyak lagi.
+Selalu berikan kode yang lengkap, bersih, dan bisa langsung dipakai.
+Tambahkan komentar penjelasan dalam kode.
+Jawab dalam bahasa yang digunakan pengguna.`
+  },
+  // ── ROBLOX ──
+  { cat:'ROBLOX SPECIALIST', id:'roblox-gen', name:'Script Generator', icon:'🎮', color:'#FFD046', tag:'roblox',
+    desc:'Buat script dari deskripsi',
+    topDesc:'Buat script Roblox lengkap dari deskripsi kamu',
+    placeholder:'Deskripsikan script yang kamu butuhkan...',
+    sugs:['Buat sistem checkpoint dengan DataStore','Leaderboard otomatis dari folder Workspace','Sistem role & badge berdasarkan level','RemoteEvent sistem damage client-server'],
+    system:`Kamu adalah ALVAN Roblox Script Generator, AI expert Roblox scripting berbahasa Indonesia.
+Buat script Roblox yang LENGKAP, BERSIH, dan LANGSUNG BISA DIPAKAI.
+Selalu jawab dalam Bahasa Indonesia. Kode harus lengkap dan tidak setengah-setengah.
+Tambahkan komentar penjelasan di dalam kode. Format kode dalam blok lua.
+Sertakan instruksi cara pemasangan.`
+  },
+  { cat:'ROBLOX SPECIALIST', id:'roblox-bug', name:'Bug Fixer', icon:'🔧', color:'#FF6B35', tag:'roblox',
+    desc:'Perbaiki error script Roblox',
+    topDesc:'Paste script error kamu, AI akan memperbaikinya',
+    placeholder:'Paste script yang error + pesan error dari Output...',
+    sugs:['DataStore tidak menyimpan data','RemoteEvent tidak terpanggil','NilValue error di leaderstats','Script jalan di Studio tapi error di server'],
+    system:`Kamu adalah ALVAN Roblox Bug Fixer, spesialis debugging Roblox scripting berbahasa Indonesia.
+Analisis script, identifikasi bug, jelaskan root cause, dan berikan script lengkap yang sudah diperbaiki.
+Format: 🔍 Diagnosis → 💡 Root Cause → ✅ Script Fixed → 📝 Perubahan.
+Jawab selalu dalam Bahasa Indonesia.`
+  },
+  { cat:'ROBLOX SPECIALIST', id:'roblox-explain', name:'Code Explainer', icon:'📖', color:'#00F0FF', tag:'roblox',
+    desc:'Jelaskan cara kerja script',
+    topDesc:'Paste script apapun, AI jelaskan cara kerjanya',
+    placeholder:'Paste script yang ingin kamu pahami...',
+    sugs:['Jelaskan cara kerja DataStore ini','Apa fungsi setiap bagian script ini?','Mengapa script ini pakai pcall?','Jelaskan alur RemoteEvent di sini'],
+    system:`Kamu adalah ALVAN Roblox Code Explainer, guru Roblox scripting berbahasa Indonesia.
+Jelaskan script dengan cara mudah dipahami pemula sekalipun. Mulai dengan ringkasan, jelaskan alur kerja, breakdown bagian penting, gunakan analogi jika membantu.
+Jawab selalu dalam Bahasa Indonesia.`
+  },
+  { cat:'ROBLOX SPECIALIST', id:'roblox-ui', name:'UI Builder', icon:'🎨', color:'#9D4EDD', tag:'roblox',
+    desc:'Buat GUI & interface Roblox',
+    topDesc:'Buat sistem GUI dan interface Roblox yang lengkap',
+    placeholder:'Deskripsikan UI yang kamu inginkan...',
+    sugs:['Health bar animasi smooth','Inventory GUI dengan grid','Leaderboard UI cyberpunk style','Mobile-friendly menu Roblox'],
+    system:`Kamu adalah ALVAN Roblox UI Builder, spesialis GUI dan interface Roblox berbahasa Indonesia.
+Buat sistem GUI yang INDAH, FUNGSIONAL, dan LENGKAP via script (tidak perlu manual di Studio).
+Sertakan animasi TweenService, responsif berbagai screen size, komentar jelas.
+Jawab selalu dalam Bahasa Indonesia.`
+  },
+  { cat:'ROBLOX SPECIALIST', id:'roblox-opt', name:'Optimizer', icon:'⚡', color:'#39FF14', tag:'roblox',
+    desc:'Optimasi performa script',
+    topDesc:'Optimasi performa, efisiensi, dan kualitas script',
+    placeholder:'Paste script yang ingin dioptimasi...',
+    sugs:['Script lag saat banyak player','Optimasi DataStore agar tidak throttle','Kurangi memory usage script ini','RemoteEvent terlalu sering fire'],
+    system:`Kamu adalah ALVAN Roblox Optimizer, spesialis optimasi performa Roblox berbahasa Indonesia.
+Identifikasi bottleneck, optimasi DataStore, kurangi Remote spam, memory management, loop optimization.
+Format: 📊 Analisis → 🎯 Optimasi → ⚡ Script Optimized → 📈 Estimasi Improvement.
+Jawab selalu dalam Bahasa Indonesia.`
+  }
+];
+
+// ── STATE ──
+let currentAgent = AGENTS[0];
+let messages = [];
+let isLoading = false;
+let totalTokens = 0;
+
+// ── INIT ──
+function init() {
+  renderSidebar();
+  setupTA();
+  renderWelcome();
+}
+
+function renderSidebar() {
+  const list = document.getElementById('agentsList');
+  list.innerHTML = '';
+  let lastCat = '';
+  AGENTS.forEach(a => {
+    if (a.cat !== lastCat) {
+      lastCat = a.cat;
+      const lbl = document.createElement('div');
+      lbl.className = 'category-label';
+      lbl.textContent = a.cat;
+      list.appendChild(lbl);
+    }
+    const btn = document.createElement('button');
+    btn.className = 'agent-btn' + (a.id === currentAgent.id ? ' active' : '');
+    btn.innerHTML = `
+      <div class="agent-ico" style="background:${a.color}15;border-color:${a.color}25">${a.icon}</div>
+      <div class="agent-txt">
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-sub">${a.desc}</div>
+      </div>
+      <div class="agent-dot"></div>`;
+    btn.onclick = () => switchAgent(a);
+    list.appendChild(btn);
+  });
+}
+
+function switchAgent(a) {
+  currentAgent = a;
+  messages = [];
+  renderSidebar();
+  document.getElementById('topIco').textContent = a.icon;
+  document.getElementById('topName').textContent = a.name.toUpperCase();
+  document.getElementById('topDesc').textContent = a.topDesc;
+  const tag = document.getElementById('topTag');
+  tag.textContent = a.tag.toUpperCase();
+  tag.className = 'topbar-tag ' + (a.tag === 'roblox' ? 'tag-roblox' : 'tag-general');
+  document.getElementById('prompt').placeholder = a.placeholder;
+  renderWelcome();
+}
+
+function renderWelcome() {
+  const chat = document.getElementById('chatArea');
+  const a = currentAgent;
+  chat.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-ico">${a.icon}</div>
+      <h2>${a.name.toUpperCase()}</h2>
+      <p>${a.topDesc}</p>
+      <div class="free-badge">✦ GRATIS — Tidak perlu API key</div>
+      <div class="sugs">${a.sugs.map(s=>`<button class="sug" onclick="useSug(this)">${s}</button>`).join('')}</div>
+    </div>`;
+}
+
+function useSug(btn) {
+  document.getElementById('prompt').value = btn.textContent;
+  send();
+}
+
+// ── TEXTAREA ──
+function setupTA() {
+  const ta = document.getElementById('prompt');
+  ta.placeholder = currentAgent.placeholder;
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+  });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+}
+
+// ── RENDER MARKDOWN ──
+function renderMD(text) {
+  const blocks = [];
+  let i = 0;
+  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const k = `__B${i++}__`;
+    blocks.push({ k, lang: lang || 'text', code: code.trim() });
+    return k;
+  });
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  text = text.replace(/^---$/gm, '<hr>');
+  text = text.replace(/\n/g, '<br>');
+  blocks.forEach(({ k, lang, code }) => {
+    const esc = code.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const id = 'c' + Math.random().toString(36).slice(2,8);
+    text = text.replace(k, `
+      <div style="margin:9px 0">
+        <div class="code-hdr">
+          <span>◆ ${lang.toUpperCase()}</span>
+          <button class="copy-btn" onclick="copyCode('${id}',this)">COPY</button>
+        </div>
+        <pre><code id="${id}">${esc}</code></pre>
+      </div>`);
+  });
+  return text;
+}
+
+function copyCode(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+    btn.textContent = '✓ COPIED'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+// ── APPEND ──
+function appendMsg(role, content, isErr = false) {
+  const w = document.querySelector('.welcome');
+  if (w) w.remove();
+
+  const chat = document.getElementById('chatArea');
+  const div = document.createElement('div');
+
+  if (isErr) {
+    div.className = 'msg';
+    div.innerHTML = `<div class="av av-ai">${currentAgent.icon}</div><div class="err-bub">${content}</div>`;
+  } else {
+    div.className = `msg ${role === 'user' ? 'user' : ''}`;
+    const rendered = role === 'user'
+      ? content.replace(/</g,'&lt;').replace(/\n/g,'<br>')
+      : renderMD(content);
+    const avClass = role === 'user' ? 'av-user' : 'av-ai';
+    const avLabel = role === 'user' ? 'U' : currentAgent.icon;
+    const bubClass = role === 'user' ? 'user' : 'ai';
+    div.innerHTML = `<div class="av ${avClass}">${avLabel}</div><div class="bubble ${bubClass}">${rendered}</div>`;
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function appendTyping() {
+  const chat = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'msg'; div.id = 'typing';
+  div.innerHTML = `<div class="av av-ai">${currentAgent.icon}</div><div class="bubble ai"><div class="typing-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+// ── SEND ──
+async function send() {
+  if (isLoading) return;
+  const ta = document.getElementById('prompt');
+  const text = ta.value.trim();
+  if (!text) return;
+
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  ta.value = ''; ta.style.height = 'auto';
+
+  appendMsg('user', text);
+  messages.push({ role: 'user', content: text });
+  appendTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        systemPrompt: currentAgent.system
+      })
+    });
+    const data = await res.json();
+    removeTyping();
+
+    if (!res.ok) {
+      appendMsg('ai', `❌ Error: ${data?.error || 'Gagal mendapat respons'}`, true);
+      messages.pop(); return;
+    }
+
+    const reply = data.text;
+    messages.push({ role: 'assistant', content: reply });
+    appendMsg('assistant', reply);
+
+    totalTokens += Math.round((text.length + reply.length) / 4);
+    document.getElementById('tokenCount').textContent = totalTokens.toLocaleString();
+
+  } catch (err) {
+    removeTyping();
+    appendMsg('ai', `❌ Gagal konek: ${err.message}`, true);
+    messages.pop();
+  } finally {
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
+    ta.focus();
+  }
+}
+
+function clearChat() {
+  messages = [];
+  totalTokens = 0;
+  document.getElementById('tokenCount').textContent = '0';
+  renderWelcome();
+}
+
+init();
+</script>
+</body>
+</html>
